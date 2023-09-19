@@ -15,7 +15,6 @@ def test_get_my_loc_value(my_app: App, mocker: MockerFixture):
     assert len(loc) == 2
     assert loc == (218.0, -13.3)
 
-
 def test_get_my_loc_default(my_app: App, mocker: MockerFixture):
     mocker.patch('app.App.myip', return_value={'loc': '20.0'})
     loc = my_app.get_my_loc()
@@ -26,6 +25,14 @@ def test_get_my_loc_value_error(my_app: App, mocker: MockerFixture):
     mocker.patch('app.App.myip', return_value={})
     with pytest.raises(ValueError):
         _ = my_app.get_my_loc()
+
+def test_patch_json(my_app: App, mocker: MockerFixture):
+    mock_r = mocker.patch('app.requests.get').return_value
+    mock_r.raise_for_status.return_value = None
+    mock_r.json.return_value = {'loc': '218.0,-13.3'}
+    loc = my_app.get_my_loc()
+    assert len(loc) == 2
+    assert loc == (218.0, -13.3)
 
 def test_get_my_loc(my_app: App):
     loc = my_app.get_my_loc()
